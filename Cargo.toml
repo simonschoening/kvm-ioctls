@@ -17,5 +17,4 @@ vmm-sys-util = ">=0.8.0"
 byteorder = ">=1.2.1"
 
 [patch.crates-io]
-kvm-bindings = { path = "../kvm-bindings" }
-vmm-sys-util = { path = "../vmm-sys-util" }
+kvm-bindings = { git = "https://github.com/simonschoening/kvm-bindings" }

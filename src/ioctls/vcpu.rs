@@ -92,6 +92,7 @@ pub enum VcpuExit<'a> {
     IoapicEoi(u8 /* vector */),
     /// Corresponds to KVM_EXIT_HYPERV.
     Hyperv,
+    #[cfg(target_arch = "riscv64")]
     /// Corresponds to KVM_EXIT_RISCV_SBI.
     Sbi(kvm_run__bindgen_ty_1__bindgen_ty_22),
 }
@@ -1331,6 +1332,7 @@ impl VcpuFd {
                     Ok(VcpuExit::IoapicEoi(eoi.vector))
                 }
                 KVM_EXIT_HYPERV => Ok(VcpuExit::Hyperv),
+                #[cfg(target_arch = "riscv64")]
                 KVM_EXIT_RISCV_SBI => {
                     let sbi_reason = unsafe {run.__bindgen_anon_1.riscv_sbi};
                     Ok(VcpuExit::Sbi(sbi_reason))
