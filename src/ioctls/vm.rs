@@ -1786,6 +1786,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     fn test_set_gsi_routing() {
         let kvm = Kvm::new().unwrap();
         let vm = kvm.create_vm().unwrap();

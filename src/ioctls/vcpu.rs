@@ -92,6 +92,8 @@ pub enum VcpuExit<'a> {
     IoapicEoi(u8 /* vector */),
     /// Corresponds to KVM_EXIT_HYPERV.
     Hyperv,
+    /// Corresponds to KVM_EXIT_RISCV_SBI.
+    Sbi(kvm_run__bindgen_ty_1__bindgen_ty_22),
 }
 
 /// Wrapper over KVM vCPU ioctls.
@@ -119,7 +121,7 @@ impl VcpuFd {
     /// let regs = vcpu.get_regs().unwrap();
     /// ```
     ///
-    #[cfg(not(any(target_arch = "arm", target_arch = "aarch64")))]
+    #[cfg(not(any(target_arch = "riscv64", target_arch = "arm", target_arch = "aarch64")))]
     pub fn get_regs(&self) -> Result<kvm_regs> {
         // Safe because we know that our file is a vCPU fd, we know the kernel will only read the
         // correct amount of memory from our pointer, and we verify the return result.
@@ -156,7 +158,7 @@ impl VcpuFd {
     /// }
     /// ```
     ///
-    #[cfg(not(any(target_arch = "arm", target_arch = "aarch64")))]
+    #[cfg(not(any(target_arch = "riscv64", target_arch = "arm", target_arch = "aarch64")))]
     pub fn set_regs(&self, regs: &kvm_regs) -> Result<()> {
         // Safe because we know that our file is a vCPU fd, we know the kernel will only read the
         // correct amount of memory from our pointer, and we verify the return result.
@@ -634,7 +636,8 @@ impl VcpuFd {
         target_arch = "x86_64",
         target_arch = "arm",
         target_arch = "aarch64",
-        target_arch = "s390"
+        target_arch = "s390",
+        target_arch = "riscv64"
     ))]
     pub fn get_mp_state(&self) -> Result<kvm_mp_state> {
         let mut mp_state = Default::default();
@@ -675,7 +678,8 @@ impl VcpuFd {
         target_arch = "x86_64",
         target_arch = "arm",
         target_arch = "aarch64",
-        target_arch = "s390"
+        target_arch = "s390",
+        target_arch = "riscv64"
     ))]
     pub fn set_mp_state(&self, mp_state: kvm_mp_state) -> Result<()> {
         let ret = unsafe {
@@ -1113,7 +1117,7 @@ impl VcpuFd {
     /// * `reg_id` - ID of the register for which we are setting the value.
     /// * `data` - value for the specified register.
     ///
-    #[cfg(any(target_arch = "arm", target_arch = "aarch64"))]
+    #[cfg(any(target_arch = "riscv64", target_arch = "arm", target_arch = "aarch64"))]
     pub fn set_one_reg(&self, reg_id: u64, data: u64) -> Result<()> {
         let data_ref = &data as *const u64;
         let onereg = kvm_one_reg {
@@ -1138,7 +1142,7 @@ impl VcpuFd {
     ///
     /// * `reg_id` - ID of the register.
     ///
-    #[cfg(any(target_arch = "arm", target_arch = "aarch64"))]
+    #[cfg(any(target_arch = "riscv64", target_arch = "arm", target_arch = "aarch64"))]
     pub fn get_one_reg(&self, reg_id: u64) -> Result<u64> {
         let mut reg_value = 0;
         let mut onereg = kvm_one_reg {
@@ -1327,6 +1331,10 @@ impl VcpuFd {
                     Ok(VcpuExit::IoapicEoi(eoi.vector))
                 }
                 KVM_EXIT_HYPERV => Ok(VcpuExit::Hyperv),
+                KVM_EXIT_RISCV_SBI => {
+                    let sbi_reason = unsafe {run.__bindgen_anon_1.riscv_sbi};
+                    Ok(VcpuExit::Sbi(sbi_reason))
+                }    
                 r => panic!("unknown kvm exit reason: {}", r),
             }
         } else {
@@ -1366,7 +1374,8 @@ mod tests {
         target_arch = "x86",
         target_arch = "x86_64",
         target_arch = "arm",
-        target_arch = "aarch64"
+        target_arch = "aarch64",
+        target_arch = "riscv64"
     ))]
     use Cap;
 
@@ -1615,7 +1624,9 @@ mod tests {
         target_arch = "x86_64",
         target_arch = "arm",
         target_arch = "aarch64",
-        target_arch = "s390"
+        target_arch = "s390",
+        target_arch = "riscv64"
+
     ))]
     #[test]
     fn mpstate_test() {

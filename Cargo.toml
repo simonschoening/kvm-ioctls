@@ -15,3 +15,7 @@ vmm-sys-util = ">=0.8.0"
 
 [dev-dependencies]
 byteorder = ">=1.2.1"
+
+[patch.crates-io]
+kvm-bindings = { path = "../kvm-bindings" }
+vmm-sys-util = { path = "../vmm-sys-util" }
