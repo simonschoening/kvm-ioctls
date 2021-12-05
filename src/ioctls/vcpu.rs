@@ -95,7 +95,7 @@ pub enum VcpuExit<'a> {
     Hyperv,
     #[cfg(any(target_arch = "riscv32", target_arch = "riscv64"))]
     /// Corresponds to KVM_EXIT_RISCV_SBI.
-    Sbi(kvm_run__bindgen_ty_1__bindgen_ty_22),
+    Sbi(kvm_run__bindgen_ty_1__bindgen_ty_23),
 }
 
 /// Wrapper over KVM vCPU ioctls.
