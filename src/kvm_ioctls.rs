@@ -36,6 +36,9 @@ ioctl_iow_nr!(
 /* Available with KVM_CAP_SET_TSS_ADDR */
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 ioctl_io_nr!(KVM_SET_TSS_ADDR, KVMIO, 0x47);
+/* Available with KVM_CAP_SET_IDENTITY_MAP_ADDR */
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+ioctl_iow_nr!(KVM_SET_IDENTITY_MAP_ADDR, KVMIO, 0x48, u64);
 /* Available with KVM_CAP_IRQCHIP */
 #[cfg(any(
     target_arch = "x86",
@@ -96,6 +99,12 @@ ioctl_iow_nr!(KVM_SET_PIT2, KVMIO, 0xa0, kvm_pit_state2);
 /* KVM_MEMORY_ENCRYPT_OP. Takes opaque platform dependent type: i.e. TDX or SEV */
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 ioctl_iowr_nr!(KVM_MEMORY_ENCRYPT_OP, KVMIO, 0xba, std::os::raw::c_ulong);
+/* Available on SEV-enabled guests. */
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+ioctl_ior_nr!(KVM_MEMORY_ENCRYPT_REG_REGION, KVMIO, 0xbb, kvm_enc_region);
+/* Available on SEV-enabled guests. */
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+ioctl_ior_nr!(KVM_MEMORY_ENCRYPT_UNREG_REGION, KVMIO, 0xbc, kvm_enc_region);
 
 // Ioctls for VCPU fds.
 
@@ -148,6 +157,7 @@ ioctl_iowr_nr!(KVM_GET_CPUID2, KVMIO, 0x91, kvm_cpuid2);
     target_arch = "arm",
     target_arch = "aarch64",
     target_arch = "s390",
+    target_arch = "riscv32",
     target_arch = "riscv64"
 ))]
 ioctl_ior_nr!(KVM_GET_MP_STATE, KVMIO, 0x98, kvm_mp_state);
@@ -158,6 +168,7 @@ ioctl_ior_nr!(KVM_GET_MP_STATE, KVMIO, 0x98, kvm_mp_state);
     target_arch = "arm",
     target_arch = "aarch64",
     target_arch = "s390",
+    target_arch = "riscv32",
     target_arch = "riscv64"
 ))]
 ioctl_iow_nr!(KVM_SET_MP_STATE, KVMIO, 0x99, kvm_mp_state);
@@ -198,6 +209,13 @@ ioctl_iow_nr!(KVM_SET_XCRS, KVMIO, 0xa7, kvm_xcrs);
 /* Available with KVM_CAP_KVMCLOCK_CTRL */
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 ioctl_io_nr!(KVM_KVMCLOCK_CTRL, KVMIO, 0xad);
+
+/* Available with KVM_CAP_TSC_CONTROL */
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+ioctl_io_nr!(KVM_SET_TSC_KHZ, KVMIO, 0xa2);
+/* Available with KVM_CAP_GET_TSC_KHZ */
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+ioctl_io_nr!(KVM_GET_TSC_KHZ, KVMIO, 0xa3);
 
 /* Available with KVM_CAP_ENABLE_CAP */
 #[cfg(not(any(target_arch = "arm", target_arch = "aarch64")))]

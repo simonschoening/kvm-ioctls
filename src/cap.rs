@@ -15,7 +15,6 @@ use kvm_bindings::*;
 ///
 /// The list of capabilities is based on the the KVM_CAP_* defines from the
 /// [Linux KVM header](https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/kvm.h).
-///
 #[derive(Clone, Copy, Debug)]
 #[repr(u32)]
 // We are allowing docs to be missing here because this enum is a wrapper
@@ -41,7 +40,7 @@ pub enum Cap {
     Iommu = KVM_CAP_IOMMU,
     DestroyMemoryRegionWorks = KVM_CAP_DESTROY_MEMORY_REGION_WORKS,
     UserNmi = KVM_CAP_USER_NMI,
-    #[cfg(not(target_arch = "riscv64"))]
+    #[cfg(not(any(target_arch = "riscv32", target_arch = "riscv64")))]
     SetGuestDebug = KVM_CAP_SET_GUEST_DEBUG,
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     ReinjectControl = KVM_CAP_REINJECT_CONTROL,

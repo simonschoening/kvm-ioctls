@@ -1,3 +1,31 @@
+# v0.11.0
+
+## Added
+- [[#178](https://github.com/rust-vmm/kvm-ioctls/pull/178)] Support for the AMD
+  Security Encrypted Virtualization (SEV) through the following VM ioctls:
+  `encrypt_op`, `encrypt_op_sev`, `register_enc_memory_region` and
+   `unregister_enc_memory_region`.
+- [[#184](https://github.com/rust-vmm/kvm-ioctls/pull/184)] `DeviceFd` now
+  derives `Debug`.
+
+# v0.10.0
+
+## Changed
+- Now depends on kvm-bindings >=0.5.0 which replaced the v4.20 KVM bindings
+  with the v5.13 ones.
+- Updated `VcpuExit::Debug` to return architecture specific information for the
+  debug event.
+
+# v0.9.0
+
+## Added
+- Support for accessing and controlling the Time Stamp Counter on x86 platforms
+  through the `get_tsc_khz` and `set_tsc_khz` functions.
+
+## Changed
+- Updated `create_vm` on `aarch64` to create a VM fd from the KVM fd using the
+  host's maximum IPA size.
+
 # v0.8.0
 
 ## Added

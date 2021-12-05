@@ -11,6 +11,7 @@ use vmm_sys_util::errno;
 use vmm_sys_util::ioctl::{ioctl_with_mut_ref, ioctl_with_ref};
 
 /// Wrapper over the file descriptor obtained when creating an emulated device in the kernel.
+#[derive(Debug)]
 pub struct DeviceFd {
     fd: File,
 }
@@ -22,7 +23,6 @@ impl DeviceFd {
     /// # Arguments
     ///
     /// * `device_attr` - The device attribute to be tested. `addr` field is ignored.
-    ///
     pub fn has_device_attr(&self, device_attr: &kvm_device_attr) -> Result<()> {
         let ret = unsafe { ioctl_with_ref(self, KVM_HAS_DEVICE_ATTR(), device_attr) };
         if ret != 0 {
@@ -72,7 +72,6 @@ impl DeviceFd {
     ///     device_fd.set_device_attr(&dist_attr).unwrap();
     /// }
     /// ```
-    ///
     pub fn set_device_attr(&self, device_attr: &kvm_device_attr) -> Result<()> {
         let ret = unsafe { ioctl_with_ref(self, KVM_SET_DEVICE_ATTR(), device_attr) };
         if ret != 0 {
@@ -115,8 +114,8 @@ impl DeviceFd {
     /// #[cfg(any(target_arch = "aarch64"))]
     /// {
     ///     use kvm_bindings::{
-    ///         KVM_DEV_ARM_VGIC_GRP_NR_IRQS, kvm_device_type_KVM_DEV_TYPE_ARM_VGIC_V2,
-    ///         kvm_device_type_KVM_DEV_TYPE_ARM_VGIC_V3,
+    ///         kvm_device_type_KVM_DEV_TYPE_ARM_VGIC_V2, kvm_device_type_KVM_DEV_TYPE_ARM_VGIC_V3,
+    ///         KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
     ///     };
     ///
     ///     // Create a GIC device.
@@ -126,12 +125,12 @@ impl DeviceFd {
     ///         flags: 0,
     ///     };
     ///     let device_fd = match vm.create_device(&mut gic_device) {
-    ///        Ok(fd) => fd,
-    ///        Err(_) => {
-    ///        gic_device.type_ = kvm_device_type_KVM_DEV_TYPE_ARM_VGIC_V2;
-    ///        vm.create_device(&mut gic_device)
-    ///            .expect("Cannot create KVM vGIC device")
-    ///        }
+    ///         Ok(fd) => fd,
+    ///         Err(_) => {
+    ///             gic_device.type_ = kvm_device_type_KVM_DEV_TYPE_ARM_VGIC_V2;
+    ///             vm.create_device(&mut gic_device)
+    ///                 .expect("Cannot create KVM vGIC device")
+    ///         }
     ///     };
     ///
     ///     let mut data: u32 = 0;
@@ -142,7 +141,6 @@ impl DeviceFd {
     ///     device_fd.get_device_attr(&mut gic_attr).unwrap();
     /// }
     /// ```
-    ///
     pub fn get_device_attr(&self, device_attr: &mut kvm_device_attr) -> Result<()> {
         let ret = unsafe { ioctl_with_mut_ref(self, KVM_GET_DEVICE_ATTR(), device_attr) };
         if ret != 0 {
@@ -297,9 +295,11 @@ mod tests {
         // This value should be saved in the address provided to the ioctl.
         let mut data: u32 = 0;
 
-        let mut gic_attr = kvm_bindings::kvm_device_attr::default();
-        gic_attr.group = KVM_DEV_ARM_VGIC_GRP_NR_IRQS;
-        gic_attr.addr = data as u64;
+        let mut gic_attr = kvm_bindings::kvm_device_attr {
+            group: KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+            addr: data as u64,
+            ..Default::default()
+        };
 
         // Without properly providing the address to where the
         // value will be stored, the ioctl fails with EFAULT.
